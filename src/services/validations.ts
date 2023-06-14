@@ -3,10 +3,10 @@ import httpError from "http-errors"
 
 type RequestBody = { [key: string]: any }
 
-const validateBody = (body: RequestBody, validation_schema: Validator.Rules) => {
+const validateBody = (body: RequestBody, validationSchema: Validator.Rules) => {
     let validation = new Validator(
         body,
-        validation_schema
+        validationSchema
     )
 
     if (validation.fails()) {
