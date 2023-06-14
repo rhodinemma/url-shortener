@@ -1,6 +1,7 @@
 import knex from "../config/knex"
 import httpError from "http-errors"
 import { validateCreateShortURL, validateUpdateShortURL } from "./validations";
+import { registerVisit } from "./visits";
 
 export const createShortURL = async (body: { url: string, id?: string }, user_id: number) => {
     validateCreateShortURL(body)
@@ -17,12 +18,14 @@ export const createShortURL = async (body: { url: string, id?: string }, user_id
     return results[0];
 }
 
-export const resolveURL = async (id: string) => {
+export const resolveURL = async (id: string, ip: string) => {
     const foundUrl = await knex("urls").where({ id }).select(["url"]).first();
 
     if (!foundUrl) {
         throw new httpError.NotFound("URL not found")
     }
+
+    await registerVisit(id, ip)
 
     return foundUrl.url;
 }
@@ -61,6 +64,6 @@ export const deleteURL = async (id: string, user_id: number) => {
 }
 
 export const getURLS = async (user_id: number, limit: number, offset: number) => {
-    const results = await knex("urls").where({ user_id }).limit(limit || 15).offset(offset || 0);
+    const results = await knex("urls").where({ user_id }).leftJoin("visits", "urls.id", "visits.url_id").select(["urls.id", "urls.url", "urls.created_at", knex.raw("count(visits.id) as visits_count")]).limit(limit || 15).offset(offset || 0).groupBy("urls.id").orderBy("urls.created_at", "desc");
     return results;
 }

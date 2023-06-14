@@ -1,5 +1,5 @@
 import 'dotenv/config'
-import knex, { onDatabaseConnect } from "./config/knex";
+import { onDatabaseConnect } from "./config/knex";
 
 const main = async () => {
     try {
