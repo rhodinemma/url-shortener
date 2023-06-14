@@ -1,4 +1,5 @@
 import knex from "../config/knex"
+import httpError from "http-errors"
 import { validateCreateShortURL, validateUpdateShortURL } from "./validations";
 
 export const createShortURL = async (body: { url: string, id?: string }, user_id: number) => {
@@ -7,7 +8,7 @@ export const createShortURL = async (body: { url: string, id?: string }, user_id
     if (body.id) {
         const current_record = await knex("urls").where({ id: body.id }).first();
         if (current_record) {
-            throw new Error("The ID provided already exists")
+            throw new httpError.Conflict("The ID provided already exists");
         }
     }
 
@@ -20,7 +21,7 @@ export const resolveURL = async (id: string) => {
     const foundUrl = await knex("urls").where({ id }).select(["url"]).first();
 
     if (!foundUrl) {
-        throw new Error("The ID is not valid")
+        throw new httpError.NotFound("URL not found")
     }
 
     return foundUrl.url;
@@ -32,11 +33,11 @@ export const updateURL = async (id: string, body: { url: string }, user_id: numb
     const foundUserUrl = await knex("urls").where({ id }).select(["user_id"]).first();
 
     if (!foundUserUrl) {
-        throw new Error("URL is not found")
+        throw new httpError.NotFound("URL not found")
     }
 
     if (foundUserUrl.user_id !== user_id) {
-        throw new Error("You don't have permissions to update this URL")
+        throw new httpError.Unauthorized("You don't have permissions to update this URL")
     }
 
     const results = await knex("urls").where({ id }).update({ url: body.url }, "*")
@@ -48,11 +49,11 @@ export const deleteURL = async (id: string, user_id: number) => {
     const foundUserUrl = await knex("urls").where({ id }).select(["user_id"]).first();
 
     if (!foundUserUrl) {
-        throw new Error("URL is not found")
+        throw new httpError.NotFound("URL not found")
     }
 
     if (foundUserUrl.user_id !== user_id) {
-        throw new Error("You don't have permissions to delete this URL")
+        throw new httpError.Unauthorized("You don't have permissions to delete this URL")
     }
 
     await knex("urls").where({ id }).delete();

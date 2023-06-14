@@ -1,4 +1,5 @@
 import Validator from 'validatorjs';
+import httpError from "http-errors"
 
 type RequestBody = { [key: string]: any }
 
@@ -15,7 +16,7 @@ const validateBody = (body: RequestBody, validation_schema: Validator.Rules) => 
             aggregatedErrors.push(validation.errors.first(key) as string)
         })
         // console.log(aggregatedErrors.join(' , '))
-        throw new Error(aggregatedErrors.join(' , '))
+        throw new httpError.BadRequest(aggregatedErrors.join(' , '))
     } else {
         // console.log("Validator passed")
         return true;
