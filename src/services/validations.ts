@@ -26,7 +26,7 @@ const validateBody = (body: RequestBody, validation_schema: Validator.Rules) => 
 export const validateCreateShortURL = (body: RequestBody) => {
     validateBody(body, {
         url: "url|required",
-        id: "string|min:5|max:10"
+        id: "string|min:5|max:10|not_in:urls,visits,auth"
     })
 }
 
