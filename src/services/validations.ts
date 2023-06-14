@@ -23,15 +23,21 @@ const validateBody = (body: RequestBody, validation_schema: Validator.Rules) => 
     }
 }
 
-export const validateCreateShortURL = async (body: RequestBody) => {
+export const validateCreateShortURL = (body: RequestBody) => {
     validateBody(body, {
         url: "url|required",
         id: "string|min:5|max:10"
     })
 }
 
-export const validateUpdateShortURL = async (body: RequestBody) => {
+export const validateUpdateShortURL = (body: RequestBody) => {
     validateBody(body, {
         url: "url|required",
     })
 }
+
+export const validateRegister = (body: RequestBody) => validateBody(body, { username: "string|required|min:4|max:8", password: "string|required|min:6" })
+
+export const validateLogin = (body: RequestBody) => validateBody(body, {
+    username: "string|required", password: "string|required"
+})
