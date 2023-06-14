@@ -3,7 +3,6 @@ import httpError from "http-errors"
 import { validateLogin, validateRegister } from "./validations";
 import { comparePassword, hashPassword } from "../config/encryption";
 import { generateToken } from "../config/jwt";
-import { userInfo } from "os";
 
 const getUser = async (username: string) => knex("users").whereRaw(`LOWER(username) = LOWER(?)`, [username]).first();
 
