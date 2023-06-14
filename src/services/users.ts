@@ -1,6 +1,7 @@
 import knex from "../config/knex";
 import httpError from "http-errors"
 import { validateRegister } from "./validations";
+import { hashPassword } from "../config/encryption";
 
 export const register = async (body: { username: string; password: string }) => {
     validateRegister(body)
@@ -11,7 +12,7 @@ export const register = async (body: { username: string; password: string }) => 
         throw new httpError.Conflict("Username already exists")
     }
 
-    const user = (await knex("users").insert({ username: body.username.toLowerCase(), password: body.password }, ["id", "username"]))[0];
+    const user = (await knex("users").insert({ username: body.username.toLowerCase(), password: await hashPassword(body.password) }, ["id", "username"]))[0];
 
     return user;
 }
