@@ -1,9 +1,12 @@
 import Router from "@koa/router"
+import authRouter from "./auth";
 
 const router = new Router();
 
-router.get("/hi", async (ctx) => {
-    ctx.response.body = "Next level"
-})
+router.use("/auth", authRouter.routes(), authRouter.allowedMethods());
+
+router.use("/urls");
+
+router.use("/visits")
 
 export default router
