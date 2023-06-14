@@ -1,12 +1,14 @@
 import knex from "../config/knex";
 import httpError from "http-errors"
-import { validateRegister } from "./validations";
-import { hashPassword } from "../config/encryption";
+import { validateLogin, validateRegister } from "./validations";
+import { comparePassword, hashPassword } from "../config/encryption";
+
+const getUser = async (username: string) => knex("users").whereRaw(`LOWER(username) = LOWER(?)`, [username]).first();
 
 export const register = async (body: { username: string; password: string }) => {
     validateRegister(body)
 
-    const currentUser = await knex("users").whereRaw(`LOWER(username) = LOWER(?)`, [body.username]).first();
+    const currentUser = await getUser(body.username)
 
     if (currentUser) {
         throw new httpError.Conflict("Username already exists")
@@ -17,4 +19,20 @@ export const register = async (body: { username: string; password: string }) => 
     return user;
 }
 
-export const login = async (body: { username: string; password: string }) => { }
+export const login = async (body: { username: string; password: string }) => {
+    validateLogin(body)
+
+    const existingUser = await getUser(body.username)
+
+    if (!existingUser) {
+        throw new httpError.Unauthorized("Username or password are incorrect")
+    }
+
+    const passwordMatch = await comparePassword(body.password, existingUser.password)
+
+    if (!passwordMatch) {
+        throw new httpError.Unauthorized("Invalid credentials")
+    }
+
+    return existingUser;
+}
