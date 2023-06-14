@@ -13,6 +13,9 @@ const main = async () => {
         //     password: 'test'
         // }, "*")
         // console.log(users)
+
+        // const users = await knex('users');
+        // console.log(users[0].username)
     } catch (e) {
         console.log(e)
     }
