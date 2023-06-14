@@ -1,20 +1,19 @@
 import 'dotenv/config'
 import Koa from "koa"
+import cors from '@koa/cors';
+import helmet from "koa-helmet"
+import bodyParser from 'koa-bodyparser';
 import { onDatabaseConnect } from "./config/knex";
+import { createShortURL } from './services/urls';
 
 const app = new Koa();
 
-app.use(async (ctx, next) => {
-    //ctx.response.body = "Hello Rhodin"
-    ctx.state.user_id = 10;
-    console.log('Middleware 1 finished')
-    await next();
-})
+app.use(cors())
+app.use(helmet())
+app.use(bodyParser())
 
-app.use(async (ctx, next) => {
-    console.log('Middleware 2')
-    console.log(ctx.state.user_id)
-    ctx.response.body = ctx.state.user_id
+app.use(async (ctx) => {
+    ctx.response.body = await createShortURL(ctx.query as any, 6)
 })
 
 const main = async () => {
