@@ -1,7 +1,21 @@
 import 'dotenv/config'
-import { onDatabaseConnect } from "./config/knex";
+import knex, { onDatabaseConnect } from "./config/knex";
 
-onDatabaseConnect().then(() => console.log('Database is connected')).catch((e) => {
-    console.log('Error with database connection');
-    console.log(e);
-})
+const main = async () => {
+    try {
+        await onDatabaseConnect();
+        console.log("Database is connected")
+
+        //Database is ready
+        // const users = await knex("users").select(['username']).first();
+        // const users = await knex("users").insert({
+        //     username: "test3",
+        //     password: 'test'
+        // }, "*")
+        // console.log(users)
+    } catch (e) {
+        console.log(e)
+    }
+}
+
+main();
